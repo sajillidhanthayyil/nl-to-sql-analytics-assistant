@@ -1,3 +1,4 @@
+import os
 import mysql.connector
 import requests
 import re
@@ -6,38 +7,36 @@ import importlib.util
 import matplotlib.pyplot as plt
 import asyncio
 import io
+from dotenv import load_dotenv
 
 from telegram import Update, InputFile
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-API_KEY = "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"
+load_dotenv()
+
+API_KEY = os.environ["GROQ_API_KEY"]
 MODEL = "llama3-70b-8192"
-TOKEN = "7841680979:AAFKcJroMYH2WTkaXdgbXrPeHUaUOGyBrbI"
+TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+
+DB_CONFIG = {
+    "host": os.environ.get("DB_HOST", "localhost"),
+    "user": os.environ.get("DB_USER", "root"),
+    "password": os.environ["DB_PASSWORD"],
+    "port": int(os.environ.get("DB_PORT", 3306)),
+    "database": os.environ.get("DB_NAME", "chatbot"),
+    "auth_plugin": "mysql_native_password",
+}
 
 user_states = {}
 
 
 
-conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="admin123",
-        port=3306,
-        database="chatbot",
-        auth_plugin="mysql_native_password"
-    )
+conn = mysql.connector.connect(**DB_CONFIG)
 cur = conn.cursor()
 
 
 def get_schema_description():
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="admin123",
-        port=3306,
-        database="chatbot",
-        auth_plugin="mysql_native_password"
-    )
+    conn = mysql.connector.connect(**DB_CONFIG)
     cur = conn.cursor()
     cur.execute("""
         SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_KEY 
@@ -90,15 +89,6 @@ You assist with SQL queries and graph generation related to this schema.
 """
 
 def table_fetching(sql_query):
-    # conn = mysql.connector.connect(
-    #     host="localhost",
-    #     user="root",
-    #     password="admin123",
-    #     port=3306,
-    #     database="chatbot",
-    #     auth_plugin="mysql_native_password"
-    # )
-    # cur = conn.cursor()
     cur.execute(sql_query)
     rows = cur.fetchall()
     columns = [col[0] for col in cur.description]

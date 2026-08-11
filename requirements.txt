@@ -1,0 +1,6 @@
+mysql-connector-python
+requests
+pandas
+matplotlib
+python-telegram-bot
+python-dotenv

@@ -1,13 +1,25 @@
+import os
 import mysql.connector
 import requests
 import re
 import pandas as pd
 import importlib
+from dotenv import load_dotenv
 
+load_dotenv()
 
-# Set your Groq API key
-API_KEY = "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"
+# Groq API key is loaded from the environment, never hardcoded
+API_KEY = os.environ["GROQ_API_KEY"]
 MODEL = "gemma2-9b-it"  # Change if needed
+
+DB_CONFIG = {
+    "host": os.environ.get("DB_HOST", "localhost"),
+    "user": os.environ.get("DB_USER", "root"),
+    "password": os.environ["DB_PASSWORD"],
+    "port": int(os.environ.get("DB_PORT", 3306)),
+    "database": os.environ.get("DB_NAME", "chatbot"),
+    "auth_plugin": "mysql_native_password",
+}
 
 
 connection_credentails = {
@@ -37,14 +49,7 @@ file_saving_structure = {
 
 def table_fetching(sql_query):
     # Connect to MySQL
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="admin123",
-        port=3306,
-        database="chatbot",
-        auth_plugin="mysql_native_password"
-    )
+    conn = mysql.connector.connect(**DB_CONFIG)
     cur = conn.cursor()
     
     # Fetch table structure
@@ -60,14 +65,7 @@ def table_fetching(sql_query):
     
 
 # Connect to MySQL
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="admin123",
-    port=3306,
-    database="chatbot",
-    auth_plugin="mysql_native_password"
-)
+conn = mysql.connector.connect(**DB_CONFIG)
 cur = conn.cursor()
 
 # Fetch table structure
