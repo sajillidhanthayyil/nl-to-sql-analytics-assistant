@@ -60,8 +60,8 @@ User question ──► Groq LLM (system prompt includes the DB schema)
 ### Installation
 
 ```bash
-git clone https://github.com/sajillidhanthayyil/chatbot.git
-cd chatbot
+git clone https://github.com/sajillidhanthayyil/nl-to-sql-analytics-assistant.git
+cd nl-to-sql-analytics-assistant
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
